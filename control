@@ -1,10 +1,10 @@
-Package: @@PACKAGENAME@@
-Name: @@APPNAME@@ Mod Menu @@APPVERSION@@ - @@USER@@ for iOSGods.com
-Version: @@APPVERSION@@
+Package: com.silentpwn.modmenu
+Name: SilentPwn Mod Menu
+Version: 1.0.0
 Architecture: iphoneos-arm
-Description: Feature-rich mod menu for @@APPNAME@@. Unlock new possibilities and enhance your gameplay. Designed for iOSGods.com users.
-Maintainer: Batchh (https://iosgods.com/profile/10738750-batchh/)
-Author: @@USER@@
+Description: Feature-rich mod menu for SilentPwn
+Maintainer: Batchh
+Author: YourName
 Section: Tweaks
 Depends: mobilesubstrate
-Homepage: iOSGods.com
+Homepage: https://iosgods.com
