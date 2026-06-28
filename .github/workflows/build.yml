@@ -8,10 +8,12 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Setup Theos
+      - name: Setup Theos Manually
         run: |
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          git clone --recursive https://github.com/theos/theos.git ~/theos
           echo "THEOS=~/theos" >> $GITHUB_ENV
 
       - name: Setup iOS SDK
@@ -29,7 +31,7 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ModMenu-Dylib
+          name: ModMenu-Output
           path: |
             .theos/obj/debug/*.dylib
             packages/*.deb
