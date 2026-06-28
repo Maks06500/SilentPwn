@@ -26,4 +26,9 @@ jobs:
       - name: Build Tweak
         run: |
           export THEOS=~/theos
-          make package FINALPACKAGE=1 SYSROOT=~/theos/sdks/iPhoneOS14.5.sdk TARGET=iphone:clang:14.5:14.5 ARCHS="arm64 arm64e"
+          # On récupère le chemin actif de Xcode sur la machine GitHub
+          XCODE_PATH=$(xcode-select -p)
+          # On force Clang à inclure le dossier C++ de Xcode pour éviter le "string file not found"
+          export CPLUS_INCLUDE_PATH="$XCODE_PATH/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"
+          
+          make package FINALPACKAGE=1 SYSROOT=~/theos/sdks/iPhoneOS14.5.sdk TARGET=iphone:clang:14.5:14.5
