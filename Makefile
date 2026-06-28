@@ -24,7 +24,8 @@ ADDITIONAL_LDFLAGS = -stdlib=libc++
 
 TWEAK_NAME = @@PROJECTNAME@@
 
-${TWEAK_NAME}_CFLAGS = -fobjc-arc -std=c++17 -I$(THEOS_PROJECT_DIR)/Lib/Keystone/includes
+${TWEAK_NAME}_CFLAGS = -fobjc-arc -std=c++11 -stdlib=libc++
+${TWEAK_NAME}_OBJCCFLAGS = -std=c++11 -stdlib=libc++
 ${TWEAK_NAME}_CCFLAGS = -std=c++17
 ${TWEAK_NAME}_CXXFLAGS = -std=c++17
 ${TWEAK_NAME}_FRAMEWORKS = UIKit Foundation QuartzCore
