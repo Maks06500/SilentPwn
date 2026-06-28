@@ -11,6 +11,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install ldid
+        run: brew install ldid
+
       - name: Setup Theos
         run: |
           git clone --recursive https://github.com/theos/theos.git ~/theos
@@ -19,6 +22,5 @@ jobs:
       - name: Build Tweak
         run: |
           export THEOS=~/theos
-          # Force Xcode et Clang à compiler avec une cible minimale iOS 15.0
           export IPHONEOS_DEPLOYMENT_TARGET=15.0
           make package FINALPACKAGE=1 TARGET=iphone:clang:latest:15.0
