@@ -18,6 +18,10 @@ THEOS_PACKAGE_SCHEME = rootless #rootfull
 
 include $(THEOS)/makefiles/common.mk
 
+ADDITIONAL_CFLAGS = -stdlib=libc++ -std=c++11
+ADDITIONAL_LDFLAGS = -stdlib=libc++
+
+
 TWEAK_NAME = @@PROJECTNAME@@
 
 ${TWEAK_NAME}_CFLAGS = -fobjc-arc -std=c++17 -I$(THEOS_PROJECT_DIR)/Lib/Keystone/includes
