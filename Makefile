@@ -7,9 +7,9 @@ THEOS_PACKAGE_SCHEME = rootless
 
 include $(THEOS)/makefiles/common.mk
 
-# Options globales pour compiler l'Objective-C++ et le C++ standard
-ADDITIONAL_CFLAGS = -fobjc-arc -std=c++11 -stdlib=libc++
-ADDITIONAL_OBJCCFLAGS = -std=c++11 -stdlib=libc++
+# Version modernisée pour accepter les boucles constexpr (C++17)
+ADDITIONAL_CFLAGS = -fobjc-arc -std=c++17 -stdlib=libc++
+ADDITIONAL_OBJCCFLAGS = -std=c++17 -stdlib=libc++
 ADDITIONAL_LDFLAGS = -stdlib=libc++
 
 TWEAK_NAME = SilentPwn
