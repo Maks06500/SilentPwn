@@ -1,47 +1,34 @@
-ARCHS = arm64 #arm64e
-DEBUG = 1 #0
-FOR_RELEASE = 0 #1
-FINALPACKAGE = 0 #1
+ARCHS = arm64 arm64e
+DEBUG = 0
+FINALPACKAGE = 1
 
-# Only set this to 1 if you are building the tweak in a mobile device
-MOBILE_THEOS=0
-ifeq ($(MOBILE_THEOS),1)
-  # path to your sdk
-  SDK_PATH = $(THEOS)/sdks/iPhoneOS15.5.sdk/
-  $(info ===> Setting SYSROOT to $(SDK_PATH)...)
-  SYSROOT = $(SDK_PATH)
-else
-  TARGET = iphone:clang:latest:15.5
-endif
-
-THEOS_PACKAGE_SCHEME = rootless #rootfull
+TARGET = iphone:clang:14.5:14.5
+THEOS_PACKAGE_SCHEME = rootless
 
 include $(THEOS)/makefiles/common.mk
 
-ADDITIONAL_CFLAGS = -stdlib=libc++ -std=c++11
+# Options globales pour compiler l'Objective-C++ et le C++ standard
+ADDITIONAL_CFLAGS = -fobjc-arc -std=c++11 -stdlib=libc++
+ADDITIONAL_OBJCCFLAGS = -std=c++11 -stdlib=libc++
 ADDITIONAL_LDFLAGS = -stdlib=libc++
 
+TWEAK_NAME = SilentPwn
 
-TWEAK_NAME = @@PROJECTNAME@@
+# Frameworks et bibliothèques statiques du projet
+SilentPwn_FRAMEWORKS = UIKit Foundation QuartzCore
+SilentPwn_LIBRARIES += substrate
+SilentPwn_LDFLAGS += $(THEOS_PROJECT_DIR)/Lib/Keystone/arm64/libkeystone.a
+SilentPwn_CFLAGS += -I$(THEOS_PROJECT_DIR)/Lib/Keystone/includes
 
-${TWEAK_NAME}_CFLAGS = -fobjc-arc -std=c++11 -stdlib=libc++
-${TWEAK_NAME}_OBJCCFLAGS = -std=c++11 -stdlib=libc++
-${TWEAK_NAME}_CCFLAGS = -std=c++17
-${TWEAK_NAME}_CXXFLAGS = -std=c++17
-${TWEAK_NAME}_FRAMEWORKS = UIKit Foundation QuartzCore
-${TWEAK_NAME}_LDFLAGS += $(THEOS_PROJECT_DIR)/Lib/Keystone/arm64/libkeystone.a
-${TWEAK_NAME}_CFLAGS += -I$(THEOS_PROJECT_DIR)/Lib/Keystone/includes
-
-${TWEAK_NAME}_FILES = Tweak.mm \
-	${wildcard Source/Memory/Kitty/*.cpp} \
-	${wildcard Source/Memory/Kitty/*.mm} \
-	${wildcard Source/UI/*.mm} \
-	${wildcard Source/Memory/Hook/*.mm} \
-	${wildcard Source/Memory/Patch/*.mm} \
-	${wildcard Source/Memory/Helper.mm} \
-	${wildcard Source/Framework/*.mm} \
-	${wildcard Source/Memory/Thread/*.mm}
-
-${TWEAK_NAME}_LIBRARIES += substrate
+# Fichiers sources à inclure à la compilation
+SilentPwn_FILES = Tweak.mm \
+	$(wildcard Source/Memory/Kitty/*.cpp) \
+	$(wildcard Source/Memory/Kitty/*.mm) \
+	$(wildcard Source/UI/*.mm) \
+	$(wildcard Source/Memory/Hook/*.mm) \
+	$(wildcard Source/Memory/Patch/*.mm) \
+	$(wildcard Source/Memory/Helper.mm) \
+	$(wildcard Source/Framework/*.mm) \
+	$(wildcard Source/Memory/Thread/*.mm)
 
 include $(THEOS_MAKE_PATH)/tweak.mk
