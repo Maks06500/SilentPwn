@@ -24,3 +24,9 @@ jobs:
           export THEOS=~/theos
           export IPHONEOS_DEPLOYMENT_TARGET=15.0
           make package FINALPACKAGE=1 TARGET=iphone:clang:latest:15.0
+
+      - name: Upload Deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: SilentPwn-Package
+          path: packages/*.deb
