@@ -26,4 +26,4 @@ jobs:
       - name: Build Tweak
         run: |
           export THEOS=~/theos
-          make package FINALPACKAGE=1 SYSROOT=~/theos/sdks/iPhoneOS14.5.sdk TARGET=iphone:clang:14.5:14.5
+          make package FINALPACKAGE=1 SYSROOT=~/theos/sdks/iPhoneOS14.5.sdk TARGET=iphone:clang:14.5:14.5 ADDITIONAL_CFLAGS="-stdlib=libc++" ADDITIONAL_LDFLAGS="-stdlib=libc++"
