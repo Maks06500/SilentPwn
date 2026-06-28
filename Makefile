@@ -2,7 +2,8 @@ ARCHS = arm64 arm64e
 DEBUG = 0
 FINALPACKAGE = 1
 
-TARGET = iphone:clang:14.5:14.5
+# Changement pour iOS 15.0 minimum afin d'autoriser UIButtonConfiguration
+TARGET = iphone:clang:15.5:15.0
 THEOS_PACKAGE_SCHEME = rootless
 
 include $(THEOS)/makefiles/common.mk
