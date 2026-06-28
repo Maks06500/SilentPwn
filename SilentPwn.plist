@@ -1,0 +1,7 @@
+{
+    Filter = {
+        Bundles = (
+            "com.Chillgaming.oneState_1.1.1_und3fined",
+        );
+    };
+}
