@@ -28,5 +28,5 @@ jobs:
       - name: Upload Deb
         uses: actions/upload-artifact@v4
         with:
-          name: SilentPwn-Package
-          path: packages/*.deb
+          name: DarkScript2-Package
+          path: ./*.deb
