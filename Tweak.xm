@@ -34,7 +34,7 @@ void handlePan(UIPanGestureRecognizer *recognizer) {
 void setupUI() {
     if (overlayWindow) return;
 
-    // Récupération moderne de la fenêtre active
+    // Récupération moderne de la fenêtre active sans erreur de compilation
     UIWindow *targetWindow = nil;
     if (@available(iOS 13.0, *)) {
         for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
@@ -44,6 +44,7 @@ void setupUI() {
             }
         }
     } else {
+        // Fallback pour les vieilles versions
         targetWindow = [UIApplication sharedApplication].keyWindow;
     }
 
@@ -54,7 +55,7 @@ void setupUI() {
     overlayWindow.hidden = NO;
     overlayWindow.backgroundColor = [UIColor clearColor];
 
-    // Bouton D
+    // Bouton "D"
     floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
     floatingButton.frame = CGRectMake(50, 100, 60, 60);
     floatingButton.backgroundColor = [UIColor blackColor];
@@ -77,6 +78,7 @@ void setupUI() {
 %hook UnityAppController
 - (void)applicationDidFinishLaunching:(id)application {
     %orig;
+    // On attend un délai pour être certain que la scène est active avant d'ajouter l'UI
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         setupUI();
     });
