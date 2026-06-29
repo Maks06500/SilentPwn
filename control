@@ -1,10 +1,8 @@
-Package: com.silentpwn.modmenu
-Name: SilentPwn Mod Menu
-Version: 1.0.0
+Package: com.tonnom.darkscript
+Name: DarkScript
+Depends: mobilesubstrate, firmware (>= 14.0)
 Architecture: iphoneos-arm
-Description: Feature-rich mod menu for SilentPwn
-Maintainer: Batchh
-Author: YourName
+Description: Mon nouveau tweak DarkScript
+Version: 1.0.0
+Author: Lockedmax
 Section: Tweaks
-Depends: mobilesubstrate
-Homepage: https://iosgods.com
