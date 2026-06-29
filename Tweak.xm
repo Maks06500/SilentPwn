@@ -1,31 +1,50 @@
 #import <UIKit/UIKit.h>
 
-static UIButton *floatingButton = nil;
-static BOOL isMenuOpen = NO;
+// On crée une classe de fenêtre qui laisse passer les clics vers le jeu
+@interface TransparentWindow : UIWindow
+@end
 
-void toggleMenu() {
-    isMenuOpen = !isMenuOpen;
-    // Pour tester, juste un petit message console
-    NSLog(@"DarkScript: Bouton cliqué !");
+@implementation TransparentWindow
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *hitView = [super hitTest:point withEvent:event];
+    // Si on touche le bouton, on le traite. Sinon, on laisse le clic passer au jeu.
+    if (hitView == self || hitView == nil) return nil;
+    return hitView;
 }
+@end
+
+static UIButton *floatingButton = nil;
+static TransparentWindow *overlayWindow = nil;
 
 %hook UIWindow
 - (void)makeKeyAndVisible {
     %orig;
     
-    // On ne crée une UIWindow que si elle n'existe pas
-    if (floatingButton) return;
+    // On ne crée l'overlay qu'une fois
+    if (overlayWindow) return;
 
-    // IMPORTANT : On crée un bouton sans cadre parent bloquant
+    // Fenêtre par-dessus tout
+    overlayWindow = [[TransparentWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    overlayWindow.windowLevel = UIWindowLevelAlert + 1; // Niveau très haut
+    overlayWindow.hidden = NO;
+    overlayWindow.userInteractionEnabled = YES; // Indispensable
+
     floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
     floatingButton.frame = CGRectMake(50, 50, 60, 60);
     floatingButton.backgroundColor = [UIColor redColor];
     [floatingButton setTitle:@"D" forState:UIControlStateNormal];
     
-    // On ajoute le bouton directement sur la fenêtre du jeu
-    [self addSubview:floatingButton];
-    [self bringSubviewToFront:floatingButton];
+    // Action de test
+    [floatingButton addTarget:self action:@selector(debugClick) forControlEvents:UIControlEventTouchUpInside];
     
-    [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
+    [overlayWindow addSubview:floatingButton];
+}
+%end
+
+// Pour vérifier si ça clique
+%hook UIWindow
+%new
+- (void)debugClick {
+    NSLog(@"DarkScript: CLIC REÇU !");
 }
 %end
