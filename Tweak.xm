@@ -4,14 +4,15 @@ static UIButton *floatingButton;
 static UIView *menuView;
 static BOOL isMenuOpen = NO;
 
-// Bascule du menu
-void toggleMenu() {
-    isMenuOpen = !isMenuOpen;
-    menuView.hidden = !isMenuOpen;
-    floatingButton.alpha = isMenuOpen ? 0.5 : 1.0;
+// On force les vues à accepter le toucher (Anti-protection)
+%hook UIView
+- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    if (self == floatingButton || self == menuView) return YES;
+    return %orig;
 }
+%end
 
-// Déplacement (on utilise des gestes sur les éléments eux-mêmes)
+// Logique du bouton
 void handlePan(UIPanGestureRecognizer *recognizer) {
     UIView *view = recognizer.view;
     CGPoint translation = [recognizer translationInView:view.superview];
@@ -19,41 +20,36 @@ void handlePan(UIPanGestureRecognizer *recognizer) {
     [recognizer setTranslation:CGPointZero inView:view.superview];
 }
 
-// Fonction appelée pour injecter les éléments
-void addOverlayToWindow(UIWindow *window) {
-    if (floatingButton) return; // Déjà ajouté
-
-    // Bouton "D"
-    floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    floatingButton.frame = CGRectMake(20, 100, 50, 50);
-    [floatingButton setTitle:@"D" forState:UIControlStateNormal];
-    floatingButton.backgroundColor = [UIColor blackColor];
-    floatingButton.layer.cornerRadius = 25;
-    floatingButton.layer.borderWidth = 2.0;
-    floatingButton.layer.borderColor = [UIColor whiteColor].CGColor;
-    floatingButton.layer.zPosition = 9999;
-    
-    [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
-    [floatingButton addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
-    
-    // Menu
-    menuView = [[UIView alloc] initWithFrame:CGRectMake(80, 100, 250, 300)];
-    menuView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.9];
-    menuView.layer.cornerRadius = 15;
-    menuView.layer.zPosition = 9998;
-    menuView.hidden = YES;
-    [menuView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
-    
-    [window addSubview:floatingButton];
-    [window addSubview:menuView];
+void toggleMenu() {
+    isMenuOpen = !isMenuOpen;
+    menuView.hidden = !isMenuOpen;
 }
 
+// Injection dans la fenêtre principale
 %hook UIWindow
 - (void)makeKeyAndVisible {
     %orig;
-    UIWindow *window = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        addOverlayToWindow(window);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (floatingButton) return;
+
+        UIWindow *window = self;
+        
+        floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        floatingButton.frame = CGRectMake(50, 100, 60, 60);
+        [floatingButton setTitle:@"D" forState:UIControlStateNormal];
+        floatingButton.backgroundColor = [UIColor blackColor];
+        floatingButton.layer.cornerRadius = 30;
+        floatingButton.layer.zPosition = 10000;
+        [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
+        [floatingButton addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
+        [window addSubview:floatingButton];
+
+        menuView = [[UIView alloc] initWithFrame:CGRectMake(120, 100, 200, 200)];
+        menuView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
+        menuView.hidden = YES;
+        menuView.layer.zPosition = 10000;
+        [menuView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
+        [window addSubview:menuView];
     });
 }
 %end
