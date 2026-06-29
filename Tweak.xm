@@ -1,48 +1,84 @@
 #import <UIKit/UIKit.h>
 
-// On utilise une variable pour stocker le bouton et s'assurer qu'il n'est créé qu'une fois
+// Classe pour permettre au jeu de recevoir les clics là où il n'y a pas le bouton
+@interface PassthroughWindow : UIWindow
+@end
+
+@implementation PassthroughWindow
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    UIView *hitView = [super hitTest:point withEvent:event];
+    if (hitView == self) return nil;
+    return hitView;
+}
+@end
+
 static UIButton *floatingButton = nil;
+static UIView *menuView = nil;
+static PassthroughWindow *overlayWindow = nil;
 static BOOL isMenuOpen = NO;
 
-// Fonction de bascule du menu
+// Fonction pour basculer le menu
 void toggleMenu() {
     isMenuOpen = !isMenuOpen;
-    // Ici, tu pourrais ajouter l'affichage d'un menu complexe
-    NSLog(@"DarkScript: Menu basculé - État: %d", isMenuOpen);
+    if (menuView) menuView.hidden = !isMenuOpen;
 }
 
-// Hook de la classe principale de Unity
+// Fonction de déplacement
+void handlePan(UIPanGestureRecognizer *recognizer) {
+    UIView *view = recognizer.view;
+    CGPoint translation = [recognizer translationInView:view.superview];
+    view.center = CGPointMake(view.center.x + translation.x, view.center.y + translation.y);
+    [recognizer setTranslation:CGPointZero inView:view.superview];
+}
+
+void setupUI() {
+    if (overlayWindow) return;
+
+    // Récupération moderne de la fenêtre active
+    UIWindow *targetWindow = nil;
+    if (@available(iOS 13.0, *)) {
+        for (UIWindowScene *scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                targetWindow = scene.windows.firstObject;
+                break;
+            }
+        }
+    } else {
+        targetWindow = [UIApplication sharedApplication].keyWindow;
+    }
+
+    if (!targetWindow) return;
+
+    overlayWindow = [[PassthroughWindow alloc] initWithFrame:targetWindow.bounds];
+    overlayWindow.windowLevel = UIWindowLevelAlert + 1;
+    overlayWindow.hidden = NO;
+    overlayWindow.backgroundColor = [UIColor clearColor];
+
+    // Bouton D
+    floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    floatingButton.frame = CGRectMake(50, 100, 60, 60);
+    floatingButton.backgroundColor = [UIColor blackColor];
+    [floatingButton setTitle:@"D" forState:UIControlStateNormal];
+    floatingButton.layer.cornerRadius = 30;
+    floatingButton.layer.borderWidth = 2;
+    floatingButton.layer.borderColor = [UIColor whiteColor].CGColor;
+    [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
+    [floatingButton addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
+    [overlayWindow addSubview:floatingButton];
+
+    // Menu
+    menuView = [[UIView alloc] initWithFrame:CGRectMake(120, 100, 200, 250)];
+    menuView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
+    menuView.hidden = YES;
+    [menuView addGestureRecognizer:[[UIPanGestureRecognizer alloc] initWithTarget:nil action:@selector(handlePan:)]];
+    [overlayWindow addSubview:menuView];
+}
+
 %hook UnityAppController
-
 - (void)applicationDidFinishLaunching:(id)application {
-    %orig; // On laisse le jeu démarrer normalement
-
-    // On attend que le jeu soit totalement chargé (délai de 5 secondes)
+    %orig;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        
-        // On récupère la fenêtre principale de Unity
-        UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        if (!window) window = [[UIApplication sharedApplication].windows firstObject];
-
-        // Création du bouton "D"
-        floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        floatingButton.frame = CGRectMake(50, 100, 60, 60);
-        floatingButton.backgroundColor = [UIColor colorWithRed:0 green:0 blue:0 alpha:0.7];
-        [floatingButton setTitle:@"D" forState:UIControlStateNormal];
-        floatingButton.layer.cornerRadius = 30;
-        floatingButton.layer.borderWidth = 2;
-        floatingButton.layer.borderColor = [UIColor whiteColor].CGColor;
-        floatingButton.layer.zPosition = 99999; // Priorité maximale
-
-        // Ajout de l'action
-        [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
-
-        // Ajout au jeu
-        [window addSubview:floatingButton];
-        [window bringSubviewToFront:floatingButton];
-        
-        NSLog(@"DarkScript: Bouton injecté avec succès !");
+        setupUI();
     });
 }
-
 %end
