@@ -1,38 +1,47 @@
 #import <UIKit/UIKit.h>
 
-// On définit la fenêtre qui va contenir ton interface
-UIWindow *darkScriptWindow;
+// Déclaration de la fenêtre et du bouton
+static UIButton *floatingButton;
+static UIView *menuView;
 
-// La fonction qui crée ton carré noir avec le texte
-void createDarkScriptUI() {
-    // Création de la fenêtre par-dessus le jeu
-    darkScriptWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    darkScriptWindow.windowLevel = UIWindowLevelAlert; // Assure que c'est au-dessus
-    darkScriptWindow.hidden = NO;
-    darkScriptWindow.backgroundColor = [UIColor clearColor];
-
-    // Le carré noir
-    UIView *box = [[UIView alloc] initWithFrame:CGRectMake(20, 50, 150, 50)];
-    box.backgroundColor = [UIColor blackColor];
-    box.layer.cornerRadius = 10;
-    box.layer.borderWidth = 1.0;
-    box.layer.borderColor = [UIColor whiteColor].CGColor;
-    
-    // Le texte "DarkScript"
-    UILabel *label = [[UILabel alloc] initWithFrame:box.bounds];
-    label.text = @"DarkScript";
-    label.textColor = [UIColor whiteColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont boldSystemFontOfSize:16];
-    
-    [box addSubview:label];
-    [darkScriptWindow addSubview:box];
+// Fonction pour basculer l'affichage du menu
+void toggleMenu() {
+    menuView.hidden = !menuView.hidden;
 }
 
-// L'entrée du tweak (le constructeur)
-%ctor {
-    // On attend 3 secondes après le lancement pour que le jeu soit prêt
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        createDarkScriptUI();
-    });
+// Hook pour injecter notre interface dès que l'application est chargée
+%hook UIApplication
+
+- (void)didFinishLaunchingWithOptions:(id)options {
+    %orig;
+
+    // 1. Création du bouton flottant "D"
+    floatingButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    floatingButton.frame = CGRectMake(20, 100, 50, 50);
+    [floatingButton setTitle:@"D" forState:UIControlStateNormal];
+    floatingButton.backgroundColor = [UIColor blackColor];
+    floatingButton.layer.cornerRadius = 25;
+    floatingButton.layer.borderWidth = 2.0;
+    floatingButton.layer.borderColor = [UIColor whiteColor].CGColor;
+    [floatingButton addTarget:nil action:@selector(toggleMenu) forControlEvents:UIControlEventTouchUpInside];
+
+    // 2. Création du Menu Principal
+    menuView = [[UIView alloc] initWithFrame:CGRectMake(80, 100, 250, 300)];
+    menuView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
+    menuView.layer.cornerRadius = 15;
+    menuView.hidden = YES; // Caché par défaut
+
+    // Ajout d'un titre dans le menu
+    UILabel *title = [[UILabel alloc] initWithFrame:CGRectMake(0, 10, 250, 30)];
+    title.text = @"DarkScript Menu";
+    title.textColor = [UIColor whiteColor];
+    title.textAlignment = NSTextAlignmentCenter;
+    [menuView addSubview:title];
+
+    // 3. Ajout au Window principal
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:floatingButton];
+    [window addSubview:menuView];
 }
+
+%end
