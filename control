@@ -1,4 +1,4 @@
-Package: com.Lockedmax.darkscript2
+Package: com.lockedmax.darkscript2
 Name: DarkScript2
 Depends: mobilesubstrate, firmware (>= 14.0)
 Architecture: iphoneos-arm
