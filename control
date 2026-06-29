@@ -1,5 +1,5 @@
-Package: com.tonnom.darkscript
-Name: DarkScript
+Package: com.Lockedmax.darkscript2
+Name: DarkScript2
 Depends: mobilesubstrate, firmware (>= 14.0)
 Architecture: iphoneos-arm
 Description: Mon nouveau tweak DarkScript
