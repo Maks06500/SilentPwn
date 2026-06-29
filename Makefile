@@ -3,7 +3,7 @@ TARGET := iphone:clang:latest:14.0
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = DarkScript
+TWEAK_NAME = DarkScript2
 
 DarkScript_FILES = Tweak.xm
 DarkScript_FRAMEWORKS = UIKit
