@@ -5,7 +5,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = DarkScript2
 
-DarkScript_FILES = Tweak.xm
-DarkScript_FRAMEWORKS = UIKit
+DarkScript2_FILES = Tweak.xm
+DarkScript2_FRAMEWORKS = UIKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk
