@@ -30,7 +30,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: DarkScript2-Package
-          path: |
-            ./*.deb
-            ./packages/*.deb
-            ./.theos/obj/*.deb
+          path: ./packages/*.deb
