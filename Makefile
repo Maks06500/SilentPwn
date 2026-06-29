@@ -10,7 +10,6 @@ DarkScript2_FRAMEWORKS = UIKit
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-# Force le déplacement du fichier .deb généré vers la racine
+# Cette ligne est cruciale : elle déplace le .deb vers la racine
 after-package::
-	@mv -f ./.theos/obj/*.deb ./ || true
-
+	@mv -f ./.theos/obj/*.deb ./
